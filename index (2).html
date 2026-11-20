@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PawPulse – Understand changes. Monitor wellbeing. Keep your pet safer.</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===== Design tokens: navy / blue / teal / lavender. --ac changes per section for its own identity ===== */
+:root{--navy:#14213d;--blue:#1d4ed8;--teal:#0f766e;--lav:#ede9fe;--bg:#f3f5fb;--ink:#1e293b;--mut:#475569;--ac:#1d4ed8;--r:16px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font:16px/1.55 'Nunito Sans',system-ui,sans-serif;color:var(--ink);background:var(--bg)}
+body.big{font-size:19px}
+h1,h2,h3{font-family:Sora,sans-serif;color:var(--navy);line-height:1.2;margin:0 0 .5rem}
+a{color:var(--blue)}
+:focus-visible{outline:3px solid #f59e0b;outline-offset:2px}
+.skip{position:absolute;left:-999px}.skip:focus{left:8px;top:8px;background:#fff;padding:8px;z-index:99}
+#side{position:fixed;inset:0 auto 0 0;width:236px;background:linear-gradient(180deg,#14213d,#1e3a6e);color:#fff;padding:14px 10px;overflow:auto;z-index:20;transition:transform .25s}
+#side .logo{font:700 1.3rem Sora;padding:6px 10px 2px}#side small{display:block;padding:0 10px 12px;color:#c7d2fe;font-size:.75rem}
+#side a{display:flex;gap:10px;align-items:center;color:#e0e7ff;text-decoration:none;padding:8px 10px;border-radius:10px;font-weight:600;font-size:.93rem}
+#side a:hover{background:#ffffff1f}#side a[aria-current=page]{background:#fff;color:var(--navy)}
+svg.i{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+#main{margin-left:236px;min-height:100vh;display:flex;flex-direction:column}
+header.top{display:flex;align-items:center;gap:10px;padding:10px 22px;background:#fff;border-bottom:4px solid var(--ac);position:sticky;top:0;z-index:10}
+header.top .sp{flex:1}
+#menu{display:none}
+button,.btn{font:inherit;font-weight:700;border:0;border-radius:10px;padding:9px 16px;background:var(--ac);color:#fff;cursor:pointer;position:relative;overflow:hidden;transition:transform .1s,filter .2s}
+button:hover{filter:brightness(1.1)}button:active{transform:scale(.96)}
+button.sec{background:#fff;color:var(--navy);border:2px solid #cbd5e1}button.dng{background:#b91c1c}
+.rip{position:absolute;border-radius:50%;background:#ffffff77;transform:scale(0);animation:rp .6s linear;pointer-events:none}
+@keyframes rp{to{transform:scale(4);opacity:0}}
+#bell{background:#fff;color:var(--navy);border:2px solid #cbd5e1;padding:7px 10px;overflow:visible}
+#badge{position:absolute;top:-8px;right:-8px;background:#b91c1c;color:#fff;border-radius:99px;font-size:.72rem;min-width:20px;height:20px;line-height:20px;text-align:center}
+main{flex:1;padding:22px;max-width:1150px;width:100%;margin:0 auto}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}
+.card{background:#fff;border-radius:var(--r);padding:18px;box-shadow:0 2px 10px #14213d14;border-top:4px solid var(--ac)}
+.hero{background:linear-gradient(120deg,var(--navy),#1e40af 60%,var(--teal));color:#fff;border-radius:22px;padding:26px;margin-bottom:18px}
+.hero h1,.hero p{color:#fff;margin:0 0 6px}.hero p{color:#dbeafe}
+.tag{display:inline-block;border-radius:99px;padding:2px 10px;font-size:.78rem;font-weight:700;background:var(--lav);color:#4c1d95;margin:2px 4px 2px 0}
+.t-info{background:#dbeafe;color:#1e3a8a}.t-warn{background:#fef3c7;color:#78350f}.t-urgent{background:#fee2e2;color:#7f1d1d}.t-ok{background:#d1fae5;color:#064e3b}
+.al{border-left:8px solid #3b82f6}.al.warn{border-color:#f59e0b;background:#fffbeb}.al.urgent{border-color:#dc2626;background:#fef2f2;box-shadow:0 0 0 2px #fecaca}.al.read{opacity:.65}
+input,select,textarea{font:inherit;padding:8px 10px;border:2px solid #cbd5e1;border-radius:10px;width:100%;background:#fff}
+label{display:block;font-weight:700;margin:8px 0 3px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{width:auto}
+.av{width:56px;height:56px;border-radius:50%;object-fit:cover;background:var(--lav);flex:none;display:block}
+.av.lg{width:96px;height:96px}
+.msgs{height:340px;overflow:auto;background:#f8fafc;border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.m{max-width:85%;padding:8px 12px;border-radius:14px;animation:pop .3s;white-space:pre-wrap}
+.m.u{align-self:flex-end;background:var(--blue);color:#fff}.m.a{background:#fff;border:1px solid #cbd5e1}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}}
+.dots span{display:inline-block;width:7px;height:7px;margin:0 2px;border-radius:50%;background:#64748b;animation:bl 1s infinite}.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes bl{50%{opacity:.2}}
+#fab{position:fixed;right:18px;bottom:18px;width:58px;height:58px;border-radius:50%;z-index:30;padding:0;display:grid;place-items:center;background:var(--teal);box-shadow:0 6px 18px #0004}
+#panel{position:fixed;right:18px;bottom:88px;width:340px;max-width:calc(100vw - 36px);background:#fff;border-radius:16px;box-shadow:0 10px 30px #0005;padding:12px;z-index:30;display:none}
+#panel .msgs{height:240px}
+.rv{opacity:0;transform:translateY(22px);transition:opacity .6s,transform .6s}.rv.on{opacity:1;transform:none}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.cal button{background:#f1f5f9;color:var(--ink);padding:8px 2px;border-radius:8px}.cal button.sel{background:var(--ac);color:#fff}.cal button.has{box-shadow:inset 0 -4px 0 var(--teal)}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:90px;background:var(--navy);color:#fff;padding:10px 18px;border-radius:12px;z-index:50;display:none}
+footer{background:var(--navy);color:#cbd5e1;padding:16px 22px;font-size:.85rem}footer a{color:#fff;margin-right:12px}
+.mapw{background:#dff3ea;border-radius:14px;overflow:hidden}.mk{transition:transform 1.4s linear}
+.pill{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.ph{background:repeating-linear-gradient(45deg,#e0e7ff,#e0e7ff 10px,#ede9fe 10px,#ede9fe 20px);border-radius:12px;min-height:120px;display:grid;place-items:center;color:#334155;font-weight:700;text-align:center;padding:8px}
+@media(max-width:860px){#side{transform:translateX(-100%)}#side.open{transform:none}#main{margin-left:0}#menu{display:block}}
+@media print{#side,header.top,#fab,#panel,footer,.noprint{display:none!important}#main{margin:0}}
+body.calm *{animation:none!important;transition:none!important}.calm .rv{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<nav id="side" aria-label="Main"></nav>
+<div id="main">
+  <header class="top">
+    <button id="menu" class="sec" aria-label="Open menu">Menu</button>
+    <strong id="vt" style="font-family:Sora"></strong><span class="sp"></span>
+    <span class="tag t-info">Prototype · simulated data</span>
+    <button id="bell" aria-label="Alerts"><svg class="i" viewBox="0 0 24 24"><path d="M6 9a6 6 0 1112 0c0 6 3 7 3 7H3s3-1 3-7zM10 20a2 2 0 004 0"/></svg><span id="badge">0</span></button>
+  </header>
+  <main id="content" tabindex="-1"></main>
+  <footer>
+    <div>© 2026 PawPulse. All rights reserved.</div>
+    <div style="margin:6px 0"><a href="#/info/about">About PawPulse</a><a href="#/info/privacy">Privacy Policy</a><a href="#/info/terms">Terms of Use</a><a href="#/info/contact">Contact Us</a></div>
+    <div>PawPulse is a prototype decision-support concept. It does not replace professional veterinary assessment.</div>
+  </footer>
+</div>
+<button id="fab" aria-label="Open AI companion chat"><svg class="i" viewBox="0 0 24 24" style="width:28px;height:28px"><path d="M4 5h16v11H9l-5 4z"/></svg></button>
+<section id="panel" aria-label="Quick chat"><div class="row" style="justify-content:space-between"><strong>AI Companion</strong><button class="sec" data-act="expand">Expand</button></div><div class="msgs" id="pm"></div>
+<div class="row" style="margin-top:6px;flex-wrap:nowrap"><input id="pi" aria-label="Message" placeholder="Ask about your pet"><button data-act="psend">Send</button></div></section>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ===================== helpers ===================== */
+const $=s=>document.querySelector(s);
+const E=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// localStorage wrappers (all app data is saved under the "pp_" prefix)
+const L=(k,d)=>{try{return JSON.parse(localStorage.getItem('pp_'+k))??d}catch{return d}};
+const S=(k,v)=>{try{localStorage.setItem('pp_'+k,JSON.stringify(v))}catch(e){toast('Storage is full – try a smaller picture')}};
+const uid=()=>Math.random().toString(36).slice(2,9);
+const iso=d=>{d=new Date(d);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const today=()=>iso(new Date());
+const addDays=(s,n)=>{const d=new Date(s+'T12:00');d.setDate(d.getDate()+n);return iso(d)};
+function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',3200)}
+const IC={dashboard:'M3 3h8v8H3zM13 3h8v5h-8zM13 10h8v11h-8zM3 13h8v8H3z',pets:'M12 21c-4 0-7-2-7-5s3-4 7-8c4 4 7 5 7 8s-3 5-7 5z',location:'M12 21s7-6 7-11a7 7 0 10-14 0c0 5 7 11 7 11zM12 12a2 2 0 100-4 2 2 0 000 4z',insights:'M4 20V10M10 20V4M16 20v-8M22 20H2',timeline:'M3 12h4l3-8 4 16 3-8h4',alerts:'M6 9a6 6 0 1112 0c0 6 3 7 3 7H3s3-1 3-7zM10 20a2 2 0 004 0',calendar:'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',device:'M7 4h10v16H7zM11 17h2',reports:'M6 3h9l4 4v14H6zM9 12h7M9 16h7',learn:'M3 6l9-3 9 3-9 3zM7 10v5c0 2 10 2 10 0v-5',community:'M8 11a3 3 0 100-6 3 3 0 000 6zM2 20c0-4 3-6 6-6s6 2 6 6M17 11a3 3 0 100-6M22 20c0-3-2-5-4-5',ai:'M4 5h16v11H9l-5 4z',evidence:'M5 4h14v16H5zM9 9h6M9 13h6',vet:'M12 4v16M4 12h16',settings:'M12 15a3 3 0 100-6 3 3 0 000 6zM12 2v3M12 19v3M2 12h3M19 12h3'};
+const ic=n=>`<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="${IC[n]}"/></svg>`;
+const NAV=[['dashboard','Dashboard','#1d4ed8'],['pets','My Pets','#0f766e'],['location','Live Location','#047857'],['insights','Insights','#6d28d9'],['timeline','Wellness Timeline','#1d4ed8'],['alerts','Alerts','#b45309'],['calendar','Calendar','#0e7490'],['device','Device','#334155'],['reports','Reports','#1e3a8a'],['learn','Learn','#7c3aed'],['community','Community','#be185d'],['ai','AI Companion','#0f766e'],['evidence','Evidence & Sources','#1e3a8a'],['vet','Veterinary Help','#b91c1c'],['settings','Settings','#475569']];
+
+/* ===================== data (seeded once, then persisted) ===================== */
+let pets=L('pets',[
+ {id:'max',name:'Max',species:'Dog',age:'4',breed:'Labrador mix',weight:'28 kg',cond:'',notes:'Loves long walks.',meds:[],photo:''},
+ {id:'luna',name:'Luna',species:'Cat',age:'3',breed:'Domestic shorthair',weight:'4.2 kg',cond:'',notes:'Indoor cat, shy with visitors.',meds:[],photo:''}]);
+const now=Date.now(),ago=h=>new Date(now-h*36e5).toISOString();
+let alerts=L('alerts',[
+ {id:'a1',pet:'max',level:'warn',cat:'Activity',title:'Activity lower than usual',text:'Max has been about 26 points below his 14-day activity baseline for 2 days.',next:'Observe appetite, energy and mobility. Contact your vet if this continues or other concerning signs appear.',when:ago(5),read:false},
+ {id:'a2',pet:'max',level:'info',cat:'Location',title:'Left safe zone briefly',text:'Max was outside the demo safe zone for about 6 minutes during a walk, then returned.',next:'No action needed if this was a planned walk.',when:ago(20),read:false},
+ {id:'a3',pet:'luna',level:'urgent',cat:'Rest',title:'Night-time restlessness changed',text:'Luna shows noticeably more night-time movement than her baseline for 3 nights in a row.',next:'Veterinary attention recommended: book a check-up and share the PawPulse report. This is an attention level, not a diagnosis.',when:ago(8),read:false},
+ {id:'a4',pet:'luna',level:'info',cat:'Rest',title:'Normal pattern',text:'Luna’s daytime rest matches her usual routine.',next:'Nothing to do.',when:ago(30),read:true},
+ {id:'a5',pet:'max',level:'info',cat:'Device',title:'Wearable battery at 38%',text:'Simulated battery reading for the concept device.',next:'Charge the device tonight.',when:ago(3),read:false}]);
+let events=L('events',[
+ {id:'e1',pet:'max',title:'Annual check-up',date:addDays(today(),2),time:'10:00',cat:'Veterinary appointment',notes:'',done:false},
+ {id:'e2',pet:'luna',title:'Grooming',date:addDays(today(),4),time:'15:30',cat:'Grooming',notes:'',done:false}]);
+let stories=L('stories',[
+ {id:'s1',title:'Max slowed down on walks',type:'Dog',user:'quiet_labrador',tags:['activity','senior'],text:'I noticed my dog stopped asking for his second walk. At first I thought it was the weather, but it lasted a week. Keeping a simple activity diary helped me explain it at the vet visit. We found something manageable and he is back to his routine. What I learned: write things down early.'},
+ {id:'s2',title:'My cat hid more than usual',type:'Cat',user:'window_seat_cat',tags:['behaviour','stress'],text:'After we moved furniture my cat spent days under the bed. I gave her quiet spaces and kept her routine steady. When she still ate less, I called the vet, who guided us from there. Noting the date things changed was really useful.'},
+ {id:'s3',title:'Learning what normal sleep looks like',type:'Dog',user:'sleepy_beagle_mum',tags:['rest'],text:'I never knew how much my puppy slept until I tracked it. Having a baseline made one restless week stand out, and a call to the vet was reassuring.'},
+ {id:'s4',title:'Water bowl habits',type:'Cat',user:'tabby_tales',tags:['hydration','routine'],text:'I started noticing how often my cat visited the water bowl. When it changed, I mentioned it to my vet with dates written down. It made the appointment much more productive.'}]);
+let chats=L('chats',[{id:'c1',t:'First chat',m:[{r:'a',t:'Hi! I’m the PawPulse companion (a rule-based simulation, not a real vet). Ask about activity, rest, alerts, medication reminders or the calendar.'}]}]);
+let curChat=L('curChat','c1');
+let cfg=Object.assign({pet:'max',notif:true,read:false,brief:false,big:false,calm:false},L('cfg',{}));
+const save=()=>{S('pets',pets);S('alerts',alerts);S('events',events);S('stories',stories);S('chats',chats);S('curChat',curChat);S('cfg',cfg)};
+const pet=id=>pets.find(p=>p.id===id)||pets[0];
+const selPet=()=>pet(cfg.pet);
+
+/* Pet picture, or an attractive placeholder with the initial */
+function av(p,c=''){if(!p)return '';return p.photo?`<img class="av ${c}" src="${p.photo}" alt="Photo of ${E(p.name)}">`:
+ `<svg class="av ${c}" viewBox="0 0 48 48" role="img" aria-label="Placeholder picture for ${E(p.name)}"><rect width="48" height="48" fill="#ddd6fe"/><circle cx="24" cy="19" r="9" fill="#7c3aed"/><path d="M6 48c2-12 10-15 18-15s16 3 18 15z" fill="#4c1d95"/><text x="24" y="23" text-anchor="middle" font-size="11" fill="#fff" font-family="Sora">${E(p.name[0]||'?')}</text></svg>`}
+
+/* ===================== simulated wellbeing metrics ===================== */
+const rnd=s=>{const x=Math.sin(s)*1e4;return x-Math.floor(x)};
+function metrics(pid,date){ // deterministic fake data so graphs are stable
+ const n=Math.round((new Date(today()+'T12:00')-new Date(date+'T12:00'))/864e5),k=[...pid].reduce((a,c)=>a+c.charCodeAt(0),0),s=new Date(date).getTime()/864e5+k;
+ let a=(pid==='luna'?58:72)+rnd(s)*16-8,r=(pid==='luna'?14:11)+rnd(s+1)*2-1;
+ if(pid==='max'&&n<=1)a-=26; if(pid==='luna'&&n<=2)r-=3;
+ const obs=[];if(a<(pid==='luna'?50:60))obs.push('Activity below usual');if(r<11&&pid==='luna')obs.push('Rest pattern changed');if(!obs.length)obs.push('Normal pattern');
+ return{act:Math.round(a),rest:+r.toFixed(1),obs}}
+const baseline=pid=>{let t=0;for(let i=3;i<17;i++)t+=metrics(pid,addDays(today(),-i)).act;return Math.round(t/14)};
+
+/* ===================== router ===================== */
+function setBadge(){const n=alerts.filter(a=>!a.read).length;$('#badge').textContent=n;$('#bell').setAttribute('aria-label',`Alerts: ${n} unread`)}
+let mapTimer=null;
+function go(){
+ clearInterval(mapTimer);
+ const [v='dashboard',a,b]=location.hash.replace(/^#\//,'').split('/');
+ const nv=NAV.find(n=>n[0]===v);
+ document.body.style.setProperty('--ac',nv?nv[2]:'#1d4ed8');
+ $('#side').innerHTML=`<div class="logo">PawPulse</div><small>Understand changes. Monitor wellbeing. Keep your pet safer.</small>`+NAV.map(n=>`<a href="#/${n[0]}" ${n[0]===v?'aria-current="page"':''}>${ic(n[0])}${n[1]}</a>`).join('');
+ $('#side').classList.remove('open');
+ const fn=V[v]||V.dashboard;
+ $('#content').innerHTML=fn(a,b);
+ $('#vt').textContent=nv?nv[1]:'PawPulse';
+ document.title='PawPulse – '+(nv?nv[1]:'Info');
+ $('#fab').style.display=v==='ai'?'none':'grid';$('#panel').style.display='none';
+ setBadge();window.scrollTo(0,0);
+ if(AFTER[v])AFTER[v](a,b);
+ reveal();
+}
+// scroll reveal: elements with class rv fade up as they enter the viewport
+function reveal(){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target)}}),{threshold:.08});document.querySelectorAll('.rv').forEach(e=>io.observe(e))}
+const pick=(id='pp')=>`<label for="${id}">Selected pet</label><select id="${id}" data-pick>${pets.map(p=>`<option value="${p.id}" ${p.id===cfg.pet?'selected':''}>${E(p.name)} (${E(p.species)})</option>`).join('')}</select>`;
+const when=i=>new Date(i).toLocaleString([],{dateStyle:'medium',timeStyle:'short'});
+const lvl={info:['Informational','t-info'],warn:['Worth monitoring','t-warn'],urgent:['Veterinary attention recommended','t-urgent']};
+
+/* ===================== views ===================== */
+const V={};const AFTER={};
+V.dashboard=()=>{const p=selPet(),m=metrics(p.id,today()),b=baseline(p.id),ua=alerts.filter(a=>!a.read&&a.pet===p.id),up=events.filter(e=>e.pet===p.id&&!e.done&&e.date>=today()).sort((x,y)=>(x.date+x.time).localeCompare(y.date+y.time)).slice(0,4);
+ return `<div class="hero rv"><div class="row">${av(p,'lg')}<div><h1>${E(p.name)}’s day at a glance</h1><p>${E(p.breed)} · ${E(p.age)} yrs · Demo data</p></div><div style="margin-left:auto"><label for="pp" style="color:#fff">Switch pet</label><select id="pp" data-pick>${pets.map(x=>`<option value="${x.id}" ${x.id===p.id?'selected':''}>${E(x.name)}</option>`).join('')}</select></div></div></div>
+ <div class="grid">
+ <div class="card rv"><h3>Activity today</h3><p style="font-size:2rem;margin:0;font-family:Sora">${m.act}<small>/100</small></p><div style="background:#e2e8f0;border-radius:9px;height:12px"><div style="width:${m.act}%;height:12px;border-radius:9px;background:var(--teal)"></div></div><p>Usual (14-day baseline): ${b}. ${m.act<b-15?'<span class="tag t-warn">Worth monitoring</span>':'<span class="tag t-ok">Normal pattern</span>'}</p></div>
+ <div class="card rv"><h3>Rest</h3><p style="font-size:2rem;margin:0;font-family:Sora">${m.rest} h</p><p>Simulated rest recorded in the last 24 hours.</p></div>
+ <div class="card rv"><h3>Device</h3><p>Battery 38% · Connected (simulated)</p><a href="#/device">View device</a> · <a href="#/location">Live location</a></div>
+ <div class="card rv"><h3>Upcoming reminders</h3>${up.map(e=>`<p><strong>${E(e.title)}</strong><br>${E(e.date)} ${E(e.time)} · ${E(e.cat)}</p>`).join('')||'<p>No reminders. <a href="#/calendar">Add one</a>.</p>'}</div>
+ <div class="card rv" style="grid-column:1/-1"><h3>Important alerts (${ua.length} unread)</h3>${ua.map(a=>alertCard(a,true)).join('')||'<p>All caught up.</p>'}</div>
+ <div class="card rv" style="grid-column:1/-1"><h3>AI-generated insight (simulated)</h3><p>${insightText(p)}</p><a href="#/insights">See all insights</a></div></div>`};
+
+function insightText(p){const m=metrics(p.id,today()),b=baseline(p.id);const d=m.act-b;
+ if(d<-15)return `${p.name}’s activity is ${Math.abs(d)} points below usual (${m.act} vs a baseline of ${b}). Observe appetite, energy and mobility, and contact your veterinarian if this continues or other concerning signs appear.`;
+ return `${p.name}’s activity (${m.act}) is close to the usual ${b}. Keep up the current routine.`}
+
+function alertCard(a,mini){const p=pet(a.pet),l=lvl[a.level];
+ return `<article class="card al ${a.level} ${a.read?'read':''}" style="margin:8px 0;border-top:0"><div class="row">${av(p)}<div style="flex:1"><span class="tag ${l[1]}">${l[0]}</span><span class="tag">${E(a.cat)}</span><span class="tag">${a.read?'Reviewed':'Unread'}</span><h3 style="margin:4px 0">${E(a.title)}</h3><small>${E(p.name)} · ${when(a.when)}</small></div></div><p>${E(a.text)}</p><p><strong>Suggested next step:</strong> ${E(a.next)}</p>${a.read?'':`<button data-act="rev" data-id="${a.id}">Mark as Reviewed</button>`}</article>`}
+
+/* ---- My Pets ---- */
+let editId=null,viewId=null;
+V.pets=()=>{const e=pets.find(p=>p.id===editId);
+ return `<h1>My Pets</h1><div class="grid">${pets.map(p=>`<div class="card rv"><div class="row">${av(p)}<div><h3>${E(p.name)}</h3><span class="tag">${E(p.species)}</span><span class="tag">${E(p.age)} yrs</span></div></div><p>${E(p.breed)} · ${E(p.weight)}</p>
+ <div class="row"><button data-act="viewpet" data-id="${p.id}">View</button><button class="sec" data-act="editpet" data-id="${p.id}">Edit</button><button class="sec" data-act="selpet" data-id="${p.id}">${p.id===cfg.pet?'Selected':'Select'}</button><button class="dng" data-act="delpet" data-id="${p.id}">Delete</button></div></div>`).join('')}</div>
+ ${viewId&&pets.find(p=>p.id===viewId)?petDetail(pet(viewId)):''}
+ <form id="pf" class="card rv" style="margin-top:16px"><h2>${e?'Edit '+E(e.name):'Add a pet'}</h2><div class="grid">
+ <div><label for="f1">Name</label><input id="f1" required value="${E(e?.name)}"><label for="f2">Species</label><select id="f2"><option ${e?.species==='Cat'?'':'selected'}>Dog</option><option ${e?.species==='Cat'?'selected':''}>Cat</option></select><label for="f3">Age (years)</label><input id="f3" value="${E(e?.age)}"><label for="f4">Breed</label><input id="f4" value="${E(e?.breed)}"><label for="f5">Weight</label><input id="f5" value="${E(e?.weight)}"></div>
+ <div><label for="f6">Picture (saved in your browser)</label><input id="f6" type="file" accept="image/*"><label for="f7">Existing conditions (owner-entered)</label><textarea id="f7" rows="2">${E(e?.cond)}</textarea><label for="f8">Health notes</label><textarea id="f8" rows="2">${E(e?.notes)}</textarea></div></div>
+ <h3 style="margin-top:12px">Medications from your vet</h3><p><small>Enter exactly what your veterinarian prescribed. PawPulse never suggests doses or treatments.</small></p><div id="meds">${(e?.meds||[]).map(medRow).join('')}</div>
+ <div class="row" style="margin-top:8px"><button type="button" class="sec" data-act="addmed">Add medication</button><button type="submit">${e?'Save changes':'Add Pet'}</button>${e?'<button type="button" class="sec" data-act="cancel">Cancel edit</button>':''}</div></form>`};
+const medRow=m=>`<div class="row med" style="margin:4px 0"><input placeholder="Medication name" aria-label="Medication name" value="${E(m?.name)}"><input placeholder="Vet’s instructions / schedule" aria-label="Instructions" value="${E(m?.ins)}"><input type="time" aria-label="Reminder time" value="${E(m?.time)}"></div>`;
+const petDetail=p=>`<div class="card" style="margin-top:16px"><div class="row">${av(p,'lg')}<div><h2>${E(p.name)}</h2><p>${E(p.species)} · ${E(p.breed)} · ${E(p.age)} yrs · ${E(p.weight)}</p></div></div><p><strong>Conditions:</strong> ${E(p.cond)||'None recorded'}</p><p><strong>Notes:</strong> ${E(p.notes)||'—'}</p><p><strong>Medications (owner-entered):</strong></p>${p.meds.map(m=>`<p>• ${E(m.name)} – ${E(m.ins)} ${m.time?'at '+E(m.time):''}</p>`).join('')||'<p>None recorded</p>'}</div>`;
+const rdFile=(f,cb)=>{const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const c=document.createElement('canvas'),s=Math.min(1,200/Math.max(i.width,i.height));c.width=i.width*s;c.height=i.height*s;c.getContext('2d').drawImage(i,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.8))};i.src=r.result};r.readAsDataURL(f)};
+function savePet(ev){ev.preventDefault();const g=i=>$('#f'+i).value.trim();
+ const meds=[...document.querySelectorAll('.med')].map(r=>{const i=r.querySelectorAll('input');return{name:i[0].value.trim(),ins:i[1].value.trim(),time:i[2].value}}).filter(m=>m.name);
+ const done=photo=>{const o={name:g(1),species:g(2),age:g(3),breed:g(4),weight:g(5),cond:g(7),notes:g(8),meds};
+  if(editId){const p=pet(editId);Object.assign(p,o);if(photo)p.photo=photo;toast('Pet updated')}else{pets.push({id:uid(),photo:photo||'',...o});toast('Pet added')}
+  editId=null;save();go()};
+ const f=$('#f6').files[0];f?rdFile(f,done):done('')}
+
+/* ---- Live Location (simulated demo map) ---- */
+const ROUTES={max:[[300,120],[360,100],[430,130],[470,200],[540,250],[560,290],[480,260],[380,210],[320,170]],luna:[[250,200],[270,215],[300,225],[320,210],[300,190],[270,185]]};
+const SAFE={x:300,y:190,r:130};
+const place=[['Demo Park',140,90],['Demo Vet Clinic',470,80],['Demo Café',150,300]];
+let track='max',step={max:0,luna:0};
+V.location=()=>`<h1>Live Location</h1><p class="tag t-warn">Demo map · simulated location data. Not a real home address or GPS.</p>
+ <div class="row"><label for="tr">Follow</label><select id="tr">${pets.slice(0,2).map(p=>`<option value="${p.id}">${E(p.name)}</option>`).join('')}</select></div>
+ <div class="mapw card" style="padding:0;margin:10px 0"><svg viewBox="0 0 640 360" role="img" aria-label="Demo map with safe zone and pet markers" style="width:100%;display:block"><rect width="640" height="360" fill="#dff3ea"/><path d="M0 250 Q200 200 330 260 T640 220" stroke="#9ec9e8" stroke-width="22" fill="none"/><path d="M0 150H640M220 0V360" stroke="#fff" stroke-width="10"/>
+ <circle cx="${SAFE.x}" cy="${SAFE.y}" r="${SAFE.r}" fill="#14b8a633" stroke="#0f766e" stroke-width="3" stroke-dasharray="8 6"/><text x="${SAFE.x}" y="${SAFE.y-SAFE.r-6}" text-anchor="middle" font-size="13" fill="#115e59" font-weight="700">Safe zone (demo)</text>
+ ${place.map(p=>`<rect x="${p[1]-8}" y="${p[2]-8}" width="16" height="16" rx="3" fill="#6d28d9"/><text x="${p[1]+12}" y="${p[2]+5}" font-size="12" fill="#1e1b4b">${p[0]}</text>`).join('')}
+ ${['max','luna'].map(id=>{const p=pet(id);if(!p)return '';return `<g class="mk" id="mk-${id}" style="transform:translate(${ROUTES[id][0][0]}px,${ROUTES[id][0][1]}px)"><circle r="21" fill="#fff" stroke="#14213d" stroke-width="3"/><clipPath id="cp${id}"><circle r="18"/></clipPath>${p.photo?`<image href="${p.photo}" x="-18" y="-18" width="36" height="36" clip-path="url(#cp${id})" preserveAspectRatio="xMidYMid slice"/>`:`<circle r="18" fill="#ddd6fe"/><text y="5" text-anchor="middle" font-size="14" font-weight="700" fill="#4c1d95">${E(p.name[0])}</text>`}<text y="36" text-anchor="middle" font-size="12" font-weight="700" fill="#14213d">${E(p.name)}</text></g>`}).join('')}</svg></div>
+ <div class="grid" id="ls"></div>`;
+AFTER.location=()=>{const upd=()=>{['max','luna'].forEach(id=>{const k=$('#mk-'+id);if(!k)return;const r=ROUTES[id],s=step[id]=(step[id]+(id===track?1:0))%r.length;if(id===track){k.style.transform=`translate(${r[s][0]}px,${r[s][1]}px)`}else{k.style.transform=`translate(${r[step[id]][0]}px,${r[step[id]][1]}px)`}});
+  const r=ROUTES[track],c=r[step[track]],inside=Math.hypot(c[0]-SAFE.x,c[1]-SAFE.y)<=SAFE.r;
+  $('#ls').innerHTML=`<div class="card"><h3>${E(pet(track).name)}</h3><p>Status: <span class="tag ${inside?'t-ok':'t-warn'}">${inside?'Inside safe zone':'Outside safe zone'}</span></p><p>Recent movement: waypoint ${step[track]+1} of ${r.length} on a simulated route.</p></div>`};
+  $('#tr').value=track;$('#tr').onchange=e=>{track=e.target.value;upd()};upd();mapTimer=setInterval(upd,1600)};
+
+/* ---- Insights ---- */
+V.insights=()=>{const p=selPet(),m=metrics(p.id,today()),b=baseline(p.id),d=m.act-b,lv=d<-15?'warn':'info';
+ return `<h1>Insights</h1>${pick()}<p class="tag t-info">These are attention levels, not diagnoses.</p>
+ <div class="card al ${lv} rv" style="margin:10px 0"><span class="tag ${lvl[lv][1]}">${d<-15?'Worth monitoring':'Normal pattern'}</span><h3>Activity</h3><p><strong>Situation:</strong> ${insightText(p)}</p><p><strong>Compared with baseline:</strong> today ${m.act}, usual ${b} (${d>=0?'+':''}${d}).</p></div>
+ <div class="card rv"><h3>Care information you entered</h3>${p.cond?`<p>Conditions: ${E(p.cond)}</p>`:'<p>No conditions recorded.</p>'}${p.meds.map(x=>`<p>Medication reminder: ${E(x.name)} – ${E(x.ins)} (as entered by you; PawPulse never changes treatment).</p>`).join('')}</div>
+ <div class="card al urgent rv" style="margin-top:10px"><span class="tag t-urgent">Veterinary attention recommended</span><p>Shown when a pattern change is large or persistent. Contact your veterinarian; it is not a diagnosis.</p></div>`};
+
+/* ---- Wellness Timeline ---- */
+let tl={mode:'week',from:'',to:'',sel:null};
+function range(){const t=today();if(tl.mode==='today')return[t,t];if(tl.mode==='week')return[addDays(t,-6),t];if(tl.mode==='month')return[addDays(t,-29),t];if(tl.mode==='prev'){const d=new Date(t+'T12:00');return[iso(new Date(d.getFullYear(),d.getMonth()-1,1)),iso(new Date(d.getFullYear(),d.getMonth(),0))]}return[tl.from||addDays(t,-6),tl.to||t]}
+function chartData(p){const[a,b]=range(),pts=[];if(a===b){for(let h=0;h<24;h++){pts.push({d:a,l:h+':00',act:Math.round(Math.max(0,metrics(p.id,a).act*(h>6&&h<21?1:.2)+rnd(h+3)*20-10)),rest:+(rnd(h)*1).toFixed(1)})}return pts}
+ for(let d=a,n=0;d<=b&&n<120;d=addDays(d,1),n++){const m=metrics(p.id,d);pts.push({d,l:d.slice(5),act:m.act,rest:m.rest})}return pts}
+function chart(pts){const W=640,H=230,X=i=>40+i*(W-60)/Math.max(1,pts.length-1),Y=v=>H-30-v*(H-50)/100;
+ const line=(k,f,c)=>`<polyline fill="none" stroke="${c}" stroke-width="3" points="${pts.map((p,i)=>X(i)+','+Y(f(p))).join(' ')}"/>`+pts.map((p,i)=>`<circle tabindex="0" role="button" data-act="day" data-d="${p.d}" cx="${X(i)}" cy="${Y(f(p))}" r="5" fill="${c}"><title>${p.l}: activity ${p.act}, rest ${p.rest}${p.d.length>5?' h':''}</title></circle>`).join('');
+ return `<svg viewBox="0 0 ${W} ${H}" style="width:100%" role="img" aria-label="Activity and rest over time">${[0,50,100].map(v=>`<line x1="40" x2="${W-20}" y1="${Y(v)}" y2="${Y(v)}" stroke="#e2e8f0"/><text x="4" y="${Y(v)+4}" font-size="11">${v}</text>`).join('')}${line('a',p=>p.act,'#1d4ed8')}${line('r',p=>p.rest*4,'#0f766e')}${pts.filter((p,i)=>i%Math.ceil(pts.length/8)===0).map(p=>`<text x="${X(pts.indexOf(p))}" y="${H-8}" font-size="10" text-anchor="middle">${p.l}</text>`).join('')}</svg>`}
+V.timeline=()=>{const p=selPet(),pts=chartData(p),[a,b]=range();
+ return `<h1>Wellness Timeline</h1><p class="tag t-warn">Simulated data for the prototype</p>${pick()}
+ <div class="row" style="margin:10px 0">${[['today','Today'],['week','This Week'],['month','This Month'],['prev','Previous Month']].map(x=>`<button class="${tl.mode===x[0]?'':'sec'}" data-act="tm" data-m="${x[0]}">${x[1]}</button>`).join('')}<label for="df">From</label><input type="date" id="df" value="${a}"><label for="dt">To</label><input type="date" id="dt" value="${b}"><button data-act="rg">Apply range</button></div>
+ <div class="card"><p>Showing ${a} to ${b}. Legend: <span class="tag t-info">Blue = activity score (0–100)</span><span class="tag t-ok">Green = rest hours ×4 (scaled)</span> Select a point for that day.</p>${chart(pts)}</div><div id="dd">${dayDetail(p,tl.sel||b)}</div>`};
+function dayDetail(p,d){const m=metrics(p.id,d),al=alerts.filter(a=>a.pet===p.id&&iso(a.when)===d),ev=events.filter(e=>e.pet===p.id&&e.date===d);
+ return `<div class="card" style="margin-top:12px"><h3>${d}</h3><p>Activity ${m.act} · Rest ${m.rest} h</p><p>Observations: ${m.obs.join(', ')}</p><p>Alerts: ${al.map(a=>E(a.title)).join('; ')||'none'}</p><p>Events: ${ev.map(e=>E(e.title)).join('; ')||'none'}</p></div>`}
+
+/* ---- Alerts ---- */
+let af={s:'all',c:'all'};
+V.alerts=()=>{const cats=[...new Set(alerts.map(a=>a.cat))],list=alerts.filter(a=>(af.s==='all'||(af.s==='unread')===!a.read)&&(af.c==='all'||a.cat===af.c)).sort((x,y)=>y.when.localeCompare(x.when));
+ return `<h1>Alerts</h1><div class="row"><label for="fs">Status</label><select id="fs" data-af="s"><option value="all">All</option><option value="unread" ${af.s==='unread'?'selected':''}>Unread</option><option value="reviewed" ${af.s==='reviewed'?'selected':''}>Reviewed</option></select><label for="fc">Category</label><select id="fc" data-af="c"><option value="all">All</option>${cats.map(c=>`<option ${af.c===c?'selected':''}>${E(c)}</option>`).join('')}</select><button data-act="newal">Create demo alert</button></div>
+ ${list.map(a=>alertCard(a)).join('')||'<p>No alerts match.</p>'}
+ <div class="card" style="margin-top:12px"><h3>Summary for your veterinarian</h3><pre style="white-space:pre-wrap;font:inherit">${E(vetSummary(selPet()))}</pre></div>`};
+const vetSummary=p=>`Pet: ${p.name} (${p.species}, ${p.breed}, ${p.age} yrs)\nRecent alerts:\n`+(alerts.filter(a=>a.pet===p.id).map(a=>`- ${when(a.when)}: ${a.title} – ${a.text}`).join('\n')||'- none')+`\nOwner-entered conditions: ${p.cond||'none'}\nOwner-entered medications: ${p.meds.map(m=>m.name+' ('+m.ins+')').join('; ')||'none'}\nNote: simulated prototype data, not a diagnosis.`;
+
+/* ---- Calendar ---- */
+let cal={view:'month',sel:today(),edit:null,m:new Date().getMonth(),y:new Date().getFullYear()};
+const CATS=['Medication','Veterinary appointment','Vaccination','Birthday','Grooming','Routine care','Other'];
+V.calendar=()=>{const first=new Date(cal.y,cal.m,1),dim=new Date(cal.y,cal.m+1,0).getDate(),off=first.getDay(),e=events.find(x=>x.id===cal.edit);
+ const day=d=>events.filter(x=>x.date===d).sort((a,b)=>a.time.localeCompare(b.time));
+ const evHTML=l=>l.map(x=>`<div class="card" style="margin:6px 0"><div class="row"><span style="flex:1;${x.done?'text-decoration:line-through':''}"><strong>${E(x.title)}</strong> · ${E(pet(x.pet).name)}<br>${E(x.date)} ${E(x.time)} · ${E(x.cat)} ${E(x.notes)}</span><button data-act="ecomp" data-id="${x.id}">${x.done?'Undo':'Complete'}</button><button class="sec" data-act="eedit" data-id="${x.id}">Edit</button><button class="dng" data-act="edel" data-id="${x.id}">Delete</button></div></div>`).join('')||'<p>No events.</p>';
+ let body;if(cal.view==='month'){body=`<div class="row"><button class="sec" data-act="mp">Prev</button><strong>${first.toLocaleString([],{month:'long',year:'numeric'})}</strong><button class="sec" data-act="mn">Next</button></div><div class="cal" role="grid">${'SMTWTFS'.split('').map(d=>`<strong style="text-align:center">${d}</strong>`).join('')}${'<span></span>'.repeat(off)}${Array.from({length:dim},(_,i)=>{const d=iso(new Date(cal.y,cal.m,i+1));return `<button data-act="cd" data-d="${d}" class="${d===cal.sel?'sel':''} ${day(d).length?'has':''}" aria-label="${d}">${i+1}</button>`}).join('')}</div><h3 style="margin-top:12px">${cal.sel}</h3>${evHTML(day(cal.sel))}`}
+ else if(cal.view==='week'){body=Array.from({length:7},(_,i)=>{const d=addDays(cal.sel,i);return `<h3>${d}</h3>${evHTML(day(d))}`}).join('')}
+ else body=`<h3>${cal.sel}</h3>${evHTML(day(cal.sel))}`;
+ const p=selPet();
+ return `<h1>Calendar & Reminders</h1><div class="row">${['day','week','month'].map(v=>`<button class="${cal.view===v?'':'sec'}" data-act="cv" data-v="${v}">${v[0].toUpperCase()+v.slice(1)}</button>`).join('')}</div><div class="card" style="margin:10px 0">${body}</div>
+ <form id="ef" class="card"><h2>${e?'Edit reminder':'Add reminder'}</h2><div class="grid"><div><label for="e1">Pet</label><select id="e1">${pets.map(x=>`<option value="${x.id}" ${(e?e.pet:cfg.pet)===x.id?'selected':''}>${E(x.name)}</option>`).join('')}</select><label for="e2">Title</label><input id="e2" required value="${E(e?.title)}"><label for="e3">Category</label><select id="e3">${CATS.map(c=>`<option ${e?.cat===c?'selected':''}>${c}</option>`).join('')}</select></div>
+ <div><label for="e4">Date</label><input type="date" id="e4" required value="${e?.date||cal.sel}"><label for="e5">Time</label><input type="time" id="e5" required value="${e?.time||'09:00'}"><label for="e6">Notes (optional)</label><input id="e6" value="${E(e?.notes)}"></div></div>
+ <div class="row" style="margin-top:8px"><button type="submit">${e?'Save reminder':'Add reminder'}</button>${p.meds.length?`<select id="mp" aria-label="Use medication from profile"><option value="">Use ${E(p.name)}’s medication…</option>${p.meds.map((m,i)=>`<option value="${i}">${E(m.name)}</option>`).join('')}</select>`:''}${e?'<button type="button" class="sec" data-act="ecancel">Cancel</button>':''}</div>
+ <p><small>Reminders appear inside PawPulse only while it is open in your browser. PawPulse does not send notifications when closed.</small></p></form>`};
+
+/* ---- Device, Reports ---- */
+V.device=()=>`<h1>PawPulse Wearable</h1><p class="tag t-warn">Concept device · all measurements simulated</p><div class="grid"><div class="card"><div class="ph">Image placeholder: adjustable wearable on a dog and a cat</div></div><div class="card"><p><strong>Connection:</strong> Connected (simulated)</p><p><strong>Battery:</strong> 38%</p><div style="background:#e2e8f0;height:12px;border-radius:9px"><div style="width:38%;height:12px;background:#f59e0b;border-radius:9px"></div></div><p><strong>Location tracking:</strong> Active (demo)</p><p><strong>Activity & rest monitoring:</strong> Active (simulated)</p><p>A lightweight, adjustable design for dogs and cats.</p></div></div>`;
+V.reports=()=>{const p=selPet(),m=metrics(p.id,today());
+ return `<h1>Wellbeing Report</h1>${pick()}<button class="noprint" data-act="print" style="margin:10px 0">Print / Save as PDF</button>
+ <div class="card"><h2>${E(p.name)} – ${today()}</h2><div class="row">${av(p,'lg')}<p>${E(p.species)} · ${E(p.breed)} · ${E(p.age)} yrs · ${E(p.weight)}</p></div>
+ <p><strong>Conditions (owner-entered):</strong> ${E(p.cond)||'none'}</p><p><strong>Care notes:</strong> ${E(p.notes)||'none'}</p><p><strong>Medications (owner-entered):</strong> ${p.meds.map(x=>E(x.name)+' – '+E(x.ins)).join('; ')||'none'}</p>
+ <p><strong>Today (simulated):</strong> activity ${m.act}, rest ${m.rest} h. Baseline ${baseline(p.id)}.</p><p><strong>Last 7 days:</strong></p>${chart(chartDataFor(p))}
+ <p><strong>Insight:</strong> ${insightText(p)}</p><pre style="white-space:pre-wrap;font:inherit">${E(vetSummary(p))}</pre><p><small>Prototype with simulated data. Attention levels are not diagnoses.</small></p></div>`};
+const chartDataFor=p=>{const s=tl.mode;tl.mode='week';const r=chartData(p);tl.mode=s;return r};
+
+/* ---- Learn ---- */
+const T=(t,d,pts,s)=>({t,d,pts,s});
+const SAFE_DEF='If you are worried about your pet, contact a veterinarian. This content is general awareness only and is not veterinary advice.';
+const LEARN=[
+ ['everyday','Everyday Care','Routines, behaviour observation, practical care and preparation.',[T('Building a daily routine','Consistent feeding, exercise and rest make changes easier to notice.',['Keep regular meal and walk times','Note energy and appetite daily','Prepare supplies in advance'],SAFE_DEF),T('Noticing behaviour changes','Learn how your pet usually acts so you can spot differences early.',['Write down what changed and when','Note whether it persists','Share the notes with your vet'],SAFE_DEF)]],
+ ['monitor','Basic Health Monitoring','Know your pet’s normal and track gentle trends.',[T('Knowing your pet’s normal','A baseline helps you compare today with usual patterns.',['Track appetite, thirst, energy and sleep','Look at trends, not single days','Record dates for your vet'],SAFE_DEF),T('Activity and rest tracking','Wearables and diaries can show how routines shift.',['Compare to your pet’s own baseline','Context matters: weather, age, routine','Persistent changes deserve a vet conversation'],SAFE_DEF)]],
+ ['firstaid','First Aid Awareness','Awareness only. Always contact a vet in an emergency.',[T('First aid awareness basics','Understand why calling a vet early matters.',['Stay calm and keep your pet safe','Call your vet or emergency clinic for instructions','Do not give human medicines unless a vet says so'],'Awareness only; follow professional guidance.'),T('Preparing a first-aid kit','Having contact details and basic supplies ready saves time.',['Keep your vet and emergency clinic numbers handy','Ask your vet what to include in a kit','Check the kit regularly'],SAFE_DEF)]],
+ ['emergency','Emergency Information','When to seek urgent help and how to prepare.',[T('Recognising emergencies','Some signs need immediate veterinary attention.',['Trouble breathing, collapse, seizures or heavy bleeding need urgent help','Suspected poisoning needs urgent professional advice','When unsure, call your vet'],'Do not wait: contact an emergency veterinary service.'),T('Building an emergency plan','Plan before you need it.',['Save numbers for your vet and an emergency clinic','Know how you would transport your pet','Keep records and medication information together'],SAFE_DEF)]],
+ ['dog','Dog Care','Exercise, enrichment and routines for dogs.',[T('Exercise and enrichment for dogs','Mental and physical activity support wellbeing.',['Vary walks and play','Use puzzle feeders or training games','Watch for tiredness or reluctance'],SAFE_DEF),T('Walk safety','Safe outings reduce risk.',['Use a secure lead and ID tags','Offer water and shade in warm weather','Note changes in stamina'],SAFE_DEF)]],
+ ['cat','Cat Care','Litter, hydration and enrichment for cats.',[T('Litter box and hydration observations','Changes in toilet or drinking habits can be worth noting.',['Notice how often your cat uses the litter box','Note changes in drinking','Mention persistent changes to your vet'],SAFE_DEF),T('Indoor cat enrichment','Climbing, scratching and play help cats stay active.',['Provide perches and hiding places','Rotate toys','Keep routines calm and predictable'],SAFE_DEF)]]];
+V.learn=(c,t)=>{const cat=LEARN.find(x=>x[0]===c);
+ if(!cat)return `<h1>PawPulse Learn</h1><div class="grid">${LEARN.map(x=>`<a class="card rv" href="#/learn/${x[0]}" style="text-decoration:none;color:inherit"><div class="ph">Thumbnail placeholder</div><h3 style="margin-top:8px">${x[1]}</h3><p>${x[2]}</p></a>`).join('')}</div>`;
+ const tu=cat[3][t];
+ if(tu)return `<p><a href="#/learn/${c}">← Back to ${cat[1]}</a></p><h1>${tu.t}</h1><p>${tu.d}</p><ul>${tu.pts.map(x=>`<li>${x}</li>`).join('')}</ul><div class="card al warn"><strong>Safety information:</strong> ${tu.s}</div><div class="ph" style="margin-top:12px;min-height:200px">Video placeholder: add a tutorial video here later</div>`;
+ return `<p><a href="#/learn">← Back to Learn</a></p><h1>${cat[1]}</h1><p>${cat[2]}</p><div class="grid">${cat[3].map((x,i)=>`<a class="card" href="#/learn/${c}/${i}" style="text-decoration:none;color:inherit"><div class="ph">Tutorial thumbnail</div><h3 style="margin-top:8px">${x.t}</h3><p>${x.d}</p></a>`).join('')}</div>`};
+
+/* ---- Community ---- */
+let cf={q:'',sp:'all',tp:''};
+V.community=(id)=>{const s=stories.find(x=>x.id===id);
+ if(s)return `<p><a href="#/community">← Back to stories</a></p><article class="card"><h1>${E(s.title)}</h1><span class="tag">${E(s.type)}</span>${s.tags.map(t=>`<span class="tag">${E(t)}</span>`).join('')}<p><small>by ${E(s.user)}</small></p><p style="white-space:pre-wrap">${E(s.text)}</p><p class="tag t-warn">Personal story, not veterinary advice.</p></article>`;
+ const l=stories.filter(x=>(cf.sp==='all'||x.type===cf.sp)&&(!cf.tp||x.tags.some(t=>t.includes(cf.tp.toLowerCase())))&&(x.title+x.text).toLowerCase().includes(cf.q.toLowerCase()));
+ return `<h1>Community stories</h1><p class="tag t-warn">Anonymous personal experiences, not veterinary advice.</p><div class="row"><input id="cq" placeholder="Search stories" aria-label="Search stories" value="${E(cf.q)}"><select id="csp" aria-label="Species"><option value="all">All pets</option><option ${cf.sp==='Dog'?'selected':''}>Dog</option><option ${cf.sp==='Cat'?'selected':''}>Cat</option></select><input id="ctp" placeholder="Topic e.g. rest" aria-label="Topic" value="${E(cf.tp)}"></div>
+ <div class="grid" style="margin:12px 0">${l.map(x=>`<a class="card rv" href="#/community/${x.id}" style="text-decoration:none;color:inherit"><h3>${E(x.title)}</h3><span class="tag">${E(x.type)}</span>${x.tags.map(t=>`<span class="tag">${E(t)}</span>`).join('')}<p>${E(x.text.slice(0,110))}…</p></a>`).join('')||'<p>No stories match.</p>'}</div>
+ <form id="sf" class="card"><h2>Share Your Story</h2><label for="s1">Title</label><input id="s1" required><label for="s2">Pet type</label><select id="s2"><option>Dog</option><option>Cat</option></select><label for="s3">Topic / tags (optional, comma separated)</label><input id="s3"><label for="s4">Write your story</label><textarea id="s4" rows="7" required></textarea><p><small>Share what your pet experienced, any condition you’re comfortable discussing, what helped and what you learned. Your story is posted exactly as written.</small></p><button>Publish story</button></form>`};
+
+/* ---- Evidence, Vet help, Settings, Info ---- */
+const SRC=[['WSAVA Global Guidelines','Global veterinary guidelines for pet care.','https://wsava.org/global-guidelines/'],['AAHA','American Animal Hospital Association: guidelines and pet owner resources.','https://www.aaha.org'],['Cornell Feline Health Center','Cat health information from a veterinary college.','https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center'],['International Cat Care','Charity resources on cat health and behaviour.','https://icatcare.org'],['Merck Veterinary Manual (pet owner)','Reference on animal health topics.','https://www.merckvetmanual.com/'],['ASPCA Animal Poison Control','Information on toxic substances for pets.','https://www.aspca.org/pet-care/animal-poison-control']];
+V.evidence=()=>`<h1>Evidence & Sources</h1><div class="grid"><div class="card"><span class="tag t-ok">Published evidence</span><p>Linked sources below are published by veterinary organisations.</p></div><div class="card"><span class="tag t-info">Simulated app data</span><p>Activity, rest, location and device values are demo data.</p></div><div class="card"><span class="tag">AI interpretation</span><p>The companion is rule-based and simulated.</p></div><div class="card"><span class="tag t-warn">Community stories</span><p>Personal experiences, not advice.</p></div></div><h2 style="margin-top:16px">Sources</h2><div class="grid">${SRC.map(s=>`<div class="card"><h3>${s[0]}</h3><p>${s[1]}</p><a href="${s[2]}" target="_blank" rel="noopener">Visit Source</a></div>`).join('')}</div>`;
+V.vet=()=>`<h1>Veterinary Help</h1><div class="grid"><div class="card al urgent"><h3>Seek urgent help</h3><ul><li>Difficulty breathing, collapse or seizures</li><li>Heavy bleeding or suspected poisoning</li><li>Severe, sudden changes in behaviour</li></ul><p>Contact an emergency vet immediately. PawPulse cannot diagnose.</p></div><div class="card"><h3>Routine questions</h3><p>Gradual changes in appetite, energy or routine are good topics for a regular appointment.</p></div><div class="card"><h3>Preparing for an appointment</h3><ul><li>Write down what changed and when</li><li>List medications exactly as prescribed</li><li>Bring your PawPulse report</li></ul><a href="#/reports">Open report</a></div></div>`;
+V.settings=()=>{const c=(k,t)=>`<label style="font-weight:400"><input type="checkbox" style="width:auto" data-cfg="${k}" ${cfg[k]?'checked':''}> ${t}</label>`;
+ return `<h1>Settings</h1><div class="card">${pick('sp')}${c('notif','In-app reminder notifications (only while PawPulse is open)')}${c('brief','Brief AI responses')}${c('read','Read AI responses aloud')}${c('big','Larger text')}${c('calm','Reduce motion')}<button class="dng" data-act="reset" style="margin-top:12px">Reset all saved data</button></div>`};
+V.info=(k)=>{const t={about:['About PawPulse','PawPulse is a prototype for monitoring pet wellbeing and understanding changes.'],privacy:['Privacy Policy','This prototype stores everything in your own browser and sends nothing to a server.'],terms:['Terms of Use','PawPulse is a prototype decision-support concept, not a substitute for veterinary assessment.'],contact:['Contact Us','No contact details are provided in this prototype.']}[k]||['Info',''];return `<h1>${t[0]}</h1><p>${t[1]}</p>`};
+
+/* ===================== AI companion (rule-based simulation) ===================== */
+let ctx={topic:null,pid:null};
+function reply(txt){const t=txt.toLowerCase(),named=pets.find(p=>t.includes(p.name.toLowerCase())),p=named||(ctx.pid?pet(ctx.pid):selPet());ctx.pid=p.id;
+ const m=metrics(p.id,today()),b=baseline(p.id),ua=alerts.filter(a=>a.pet===p.id&&!a.read),has=r=>r.test(t),say=(topic,s)=>{ctx.topic=topic;return s};
+ if(has(/poison|seizure|collaps|not breathing|bleeding heavily/))return 'That sounds like it could be an emergency. Please contact an emergency veterinarian right now. I can’t assess this.';
+ if(has(/^\s*(hi|hello|hey|good (morning|evening))\b/))return `Hello! Nice to chat. Would you like an update on ${p.name}?`;
+ if(has(/\b(bye|goodbye|see you|good night)\b/))return `Goodbye! I’ll be here if you need anything about ${p.name}.`;
+ if(has(/thank/))return 'You’re welcome! Anything else about '+p.name+'?';
+ if(has(/medic|pill|tablet|prescri/))return say('med',p.meds.length?`For ${p.name}, you entered: ${p.meds.map(x=>`${x.name} (“${x.ins}”${x.time?' at '+x.time:''})`).join('; ')}. I only repeat what you recorded from your vet and can’t advise on doses. Check the Calendar for reminders.`:`There’s no medication recorded for ${p.name}. If your vet prescribed one, add it in My Pets with their instructions.`);
+ if(has(/alert|notif|why.*(appear|show)/))return say('alert',ua.length?`${p.name} has ${ua.length} unread alert(s). The latest: “${ua[0].title}”. ${ua[0].text} Suggested next step: ${ua[0].next}`:`${p.name} has no unread alerts right now.`);
+ if(has(/activ|walk|energy|exercise/))return say('act',`${p.name}’s simulated activity today is ${m.act}/100 versus a usual ${b}. ${m.act<b-15?'That is lower than usual, so it’s worth monitoring. If it continues or other signs appear, contact your vet.':'That’s within the usual range.'}`);
+ if(has(/rest|sleep|nap/))return say('rest',`${p.name} has about ${m.rest} hours of simulated rest in the last 24 hours. ${m.obs.join(', ')}.`);
+ if(has(/where|location|safe zone|map/))return say('loc','Open Live Location to see the demo map. The positions are simulated and show whether the pet is inside or outside the demo safe zone.');
+ if(has(/battery|device|collar|wearable/))return say('dev','The concept wearable shows a simulated battery of 38% and is connected (simulated).');
+ if(has(/calendar|appointment|upcoming|remind/)){const u=events.filter(e=>e.pet===p.id&&!e.done&&e.date>=today()).sort((a,c)=>(a.date+a.time).localeCompare(c.date+c.time))[0];return say('cal',u?`Next for ${p.name}: ${u.title} on ${u.date} at ${u.time}.`:`No upcoming reminders for ${p.name}. You can add one in Calendar.`)}
+ if(has(/vet|doctor|worried|sick|ill/))return say('vet',`I can’t diagnose, but I can help you prepare. Open Reports to print a summary for your vet. If ${p.name} seems seriously unwell, contact a vet promptly.`);
+ if(has(/help|what can you/))return 'I can talk about activity, rest, alerts, medication reminders (from what you entered), the calendar, the device and how to prepare for the vet. Try “How is Max’s activity?”';
+ if(has(/why|more|what should i do|and then/)&&ctx.topic)return `Following on from ${ctx.topic}: patterns are compared with ${p.name}’s own baseline, and I only suggest observing and contacting your vet if concerns persist. Want details on alerts, rest or the calendar?`;
+ return `I’m not sure how to answer “${txt.slice(0,50)}”. Try asking about ${p.name}’s activity, rest, alerts, medication or calendar, or type “help”.`}
+const cur=()=>chats.find(c=>c.id===curChat)||chats[0];
+const msgsHTML=()=>cur().m.map(x=>`<div class="m ${x.r}">${E(x.t)}</div>`).join('');
+function paint(typing){document.querySelectorAll('.msgs').forEach(e=>{e.innerHTML=msgsHTML()+(typing?'<div class="m a dots" aria-label="Typing"><span></span><span></span><span></span></div>':'');e.scrollTop=e.scrollHeight})}
+function send(txt){txt=txt.trim();if(!txt)return;const c=cur();c.m.push({r:'u',t:txt});if(c.t==='First chat'||/^Chat /.test(c.t))if(c.m.filter(x=>x.r==='u').length===1&&c.id!=='c1')c.t=txt.slice(0,24);save();paint(true);
+ setTimeout(()=>{let r=reply(txt);if(cfg.brief)r=r.split('. ')[0]+'.';c.m.push({r:'a',t:r});save();paint(false);speak(r)},750)}
+let lastSpoken='';
+function speak(t,force){if(!('speechSynthesis' in window)||(!cfg.read&&!force))return;lastSpoken=t;speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(t))}
+V.ai=()=>`<h1>AI Companion</h1><p class="tag t-warn">Rule-based simulation using PawPulse demo data. Not a veterinarian.</p>
+ <div class="grid"><div class="card"><div class="msgs" id="fm" aria-live="polite"></div><div class="row" style="margin-top:8px;flex-wrap:nowrap"><input id="ai" aria-label="Your message" placeholder="Type a message"><button data-act="send">Send</button><button class="sec" data-act="mic" id="mic">Mic</button></div><p><small id="micn"></small></p>
+ <div class="row"><button class="sec" data-act="play">Play</button><button class="sec" data-act="pause">Pause</button><button class="sec" data-act="stop">Stop</button><label style="font-weight:400"><input type="checkbox" style="width:auto" data-cfg="read" ${cfg.read?'checked':''}> Read replies aloud</label></div></div>
+ <div class="card"><button data-act="newchat">New conversation</button><h3 style="margin-top:10px">Saved conversations</h3>${chats.map(c=>`<button class="${c.id===curChat?'':'sec'}" data-act="openchat" data-id="${c.id}" style="display:block;margin:4px 0;width:100%;text-align:left">${E(c.t)}</button>`).join('')}</div></div>`;
+AFTER.ai=()=>{paint();$('#ai').addEventListener('keydown',e=>{if(e.key==='Enter')doSend()});
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){$('#mic').disabled=true;$('#micn').textContent='Voice input is not supported in this browser.'}else $('#micn').textContent='Voice input uses your browser’s speech recognition. Replies are simulated.'};
+function doSend(){const i=$('#ai');send(i.value);i.value=''}
+
+/* ===================== events (one delegated handler = every button works) ===================== */
+document.addEventListener('click',ev=>{
+ const b=ev.target.closest('button');
+ if(b){const r=document.createElement('span'),k=b.getBoundingClientRect(),s=Math.max(k.width,k.height);r.className='rip';r.style.cssText=`width:${s}px;height:${s}px;left:${ev.clientX-k.left-s/2}px;top:${ev.clientY-k.top-s/2}px`;b.appendChild(r);setTimeout(()=>r.remove(),600)}
+ const t=ev.target.closest('[data-act]');if(!t)return;const a=t.dataset.act,id=t.dataset.id;
+ const A={
+  rev:()=>{alerts.find(x=>x.id===id).read=true;save();go()},
+  newal:()=>{const p=selPet();alerts.unshift({id:uid(),pet:p.id,level:'warn',cat:'Activity',title:'New demo alert',text:`Simulated change in ${p.name}’s routine detected.`,next:'Observe and contact your vet if it continues.',when:new Date().toISOString(),read:false});save();toast('New alert created');go()},
+  viewpet:()=>{viewId=id;go()},editpet:()=>{editId=id;go();$('#pf').scrollIntoView()},cancel:()=>{editId=null;go()},
+  selpet:()=>{cfg.pet=id;save();go()},
+  delpet:()=>{if(pets.length<2)return toast('Keep at least one pet');if(confirm('Delete this pet profile? This cannot be undone.')){pets=pets.filter(p=>p.id!==id);if(cfg.pet===id)cfg.pet=pets[0].id;save();go()}},
+  addmed:()=>$('#meds').insertAdjacentHTML('beforeend',medRow()),
+  tm:()=>{tl.mode=t.dataset.m;tl.sel=null;go()},rg:()=>{tl.mode='range';tl.from=$('#df').value;tl.to=$('#dt').value;go()},
+  day:()=>{tl.sel=t.dataset.d;$('#dd').innerHTML=dayDetail(selPet(),tl.sel)},
+  cv:()=>{cal.view=t.dataset.v;go()},cd:()=>{cal.sel=t.dataset.d;go()},mp:()=>{cal.m--;if(cal.m<0){cal.m=11;cal.y--}go()},mn:()=>{cal.m++;if(cal.m>11){cal.m=0;cal.y++}go()},
+  ecomp:()=>{const e=events.find(x=>x.id===id);e.done=!e.done;save();go()},eedit:()=>{cal.edit=id;go();$('#ef').scrollIntoView()},ecancel:()=>{cal.edit=null;go()},
+  edel:()=>{if(confirm('Delete this reminder?')){events=events.filter(x=>x.id!==id);save();go()}},
+  print:()=>window.print(),send:doSend,
+  psend:()=>{send($('#pi').value);$('#pi').value=''},expand:()=>{location.hash='#/ai'},
+  newchat:()=>{const c={id:uid(),t:'Chat '+(chats.length+1),m:[{r:'a',t:'New conversation started. Your earlier chats are still saved on the right. How can I help?'}]};chats.push(c);curChat=c.id;save();go()},
+  openchat:()=>{curChat=id;save();go()},
+  play:()=>speak(lastSpoken||cur().m.filter(x=>x.r==='a').slice(-1)[0].t,true),pause:()=>speechSynthesis.pause?.(),stop:()=>speechSynthesis.cancel?.(),
+  mic:()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return;const r=new SR();r.onresult=e=>{$('#ai').value=e.results[0][0].transcript;doSend()};r.onerror=()=>toast('Could not use the microphone');r.start();toast('Listening…')},
+  reset:()=>{if(confirm('Erase all PawPulse data stored in this browser?')){Object.keys(localStorage).filter(k=>k.startsWith('pp_')).forEach(k=>localStorage.removeItem(k));location.hash='#/dashboard';location.reload()}}};
+ if(a==='play'||a==='pause'||a==='stop'){if(!('speechSynthesis' in window))return toast('Speech is not supported here');if(a==='pause')speechSynthesis.pause();else if(a==='stop')speechSynthesis.cancel();else{speechSynthesis.resume();A.play()}return}
+ A[a]&&A[a]()});
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.dataset?.act==='day'){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}))}if(e.key==='Enter'&&e.target.id==='pi')$('[data-act=psend]').click()});
+document.addEventListener('change',e=>{const t=e.target;
+ if(t.dataset.pick!==undefined){cfg.pet=t.value;save();go()}
+ if(t.dataset.cfg){cfg[t.dataset.cfg]=t.checked;save();applyCfg()}
+ if(t.dataset.af){af[t.dataset.af]=t.value;go()}
+ if(t.id==='csp'){cf.sp=t.value;go()}
+ if(t.id==='mp'&&t.value!==''){const m=selPet().meds[t.value];$('#e2').value=m.name;$('#e3').value='Medication';if(m.time)$('#e5').value=m.time;$('#e6').value=m.ins}});
+document.addEventListener('input',e=>{if(e.target.id==='cq'){cf.q=e.target.value;go();$('#cq').focus();$('#cq').setSelectionRange(99,99)}if(e.target.id==='ctp'){cf.tp=e.target.value;go();$('#ctp').focus();$('#ctp').setSelectionRange(99,99)}});
+document.addEventListener('submit',e=>{e.preventDefault();
+ if(e.target.id==='pf')savePet(e);
+ if(e.target.id==='ef'){const o={pet:$('#e1').value,title:$('#e2').value.trim(),cat:$('#e3').value,date:$('#e4').value,time:$('#e5').value,notes:$('#e6').value.trim()};
+  if(cal.edit)Object.assign(events.find(x=>x.id===cal.edit),o);else events.push({id:uid(),done:false,...o});cal.edit=null;cal.sel=o.date;save();toast('Reminder saved');go()}
+ if(e.target.id==='sf'){stories.unshift({id:uid(),title:$('#s1').value.trim(),type:$('#s2').value,user:'anonymous_owner',tags:$('#s3').value.split(',').map(x=>x.trim().toLowerCase()).filter(Boolean),text:$('#s4').value});save();toast('Story published');cf={q:'',sp:'all',tp:''};go()}});
+$('#fab').onclick=()=>{const p=$('#panel');p.style.display=p.style.display==='block'?'none':'block';paint()};
+$('#bell').onclick=()=>location.hash='#/alerts';
+$('#menu').onclick=()=>$('#side').classList.toggle('open');
+function applyCfg(){document.body.classList.toggle('big',cfg.big);document.body.classList.toggle('calm',cfg.calm)}
+
+/* Reminders that are due show a toast and a notification while the app is open */
+function checkDue(){if(!cfg.notif)return;const seen=L('seen',[]),n=new Date(),d=iso(n),tm=n.toTimeString().slice(0,5);
+ events.filter(e=>!e.done&&e.date===d&&e.time<=tm&&!seen.includes(e.id)).forEach(e=>{seen.push(e.id);toast('Reminder due: '+e.title);alerts.unshift({id:uid(),pet:e.pet,level:'info',cat:'Reminder',title:'Reminder due: '+e.title,text:`${e.cat} at ${e.time}. ${e.notes}`,next:'Mark it complete in the Calendar once done.',when:n.toISOString(),read:false});setBadge()});S('seen',seen);save()}
+setInterval(checkDue,20000);
+applyCfg();window.addEventListener('hashchange',go);checkDue();go();
+</script>
+</body>
+</html>
